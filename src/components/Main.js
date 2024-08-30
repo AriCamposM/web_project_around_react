@@ -1,15 +1,29 @@
+import profileImage from "../images/profile__image.jpg";
+import editProfileIcon from "../images/edit__profile-icon.png";
+import editButton from "../images/Edit_Button.png";
+import closeButton from "../images/Close__Icon.png";
+import deleteButton from "../images/element__trash.png";
+import likeButton from "../images/elements__heart.png";
 
-import profileImage from '../images/profile__image.jpg'
-import editProfileIcon from '../images/edit__profile-icon.png'
-import editButton from '../images/Edit_Button.png'
-import closeButton from '../images/Close__Icon.png'
-import deleteButton from '../images/element__trash.png'
-import likeButton from '../images/elements__heart.png'
+function Main() {
+  const handleEditAvatarClick = () => {
+    console.log("Avatar Funciona");
+    document.querySelector("#popup-avatar").classList.add("popup_opened");
+  };
 
-function Main(){
-    return(
-        <>
-        <section className="profile">
+  const handleEditProfileClick = () => {
+    console.log("Editar Funciona");
+    document.querySelector("#popup-profile").classList.add("popup_opened");
+  };
+
+  const handleAddPlaceClick = () => {
+    console.log("Funciona Agregar Tarjeta");
+    document.querySelector("#popup-cards").classList.add("popup_opened");
+  };
+
+  return (
+    <>
+      <section className="profile">
         <div className="profile__container">
           <div className="profile__photo">
             <img
@@ -17,10 +31,11 @@ function Main(){
               src={profileImage}
               alt="Profile Pic"
             />
-            <img 
+            <img
               className="profile__edit-icon"
-              src={editProfileIcon} 
-              alt="Edit Icon" 
+              src={editProfileIcon}
+              alt="Edit Icon"
+              onClick={handleEditAvatarClick}
             />
           </div>
           <div className="profile__info">
@@ -31,6 +46,7 @@ function Main(){
                   src={editButton}
                   alt="Edit Button"
                   className="profile__button-image"
+                  onClick={handleEditProfileClick}
                 />
               </button>
             </div>
@@ -38,7 +54,12 @@ function Main(){
           </div>
 
           <div className="profile__add">
-            <button className="profile__button-add">+</button>
+            <button
+              className="profile__button-add"
+              onClick={handleAddPlaceClick}
+            >
+              +
+            </button>
           </div>
         </div>
       </section>
@@ -83,9 +104,9 @@ function Main(){
               className="popup__error input-about-error"
               id="input-about-error"
             ></span>
-            <button 
-              className="popup__button" 
-              id="popup__button-profile" 
+            <button
+              className="popup__button"
+              id="popup__button-profile"
               type="submit"
             >
               Guardar
@@ -94,7 +115,6 @@ function Main(){
         </form>
       </div>
 
-      
       <div className="popup" id="popup-cards">
         <form className="popup__form" noValidate>
           <div className="popup__container">
@@ -143,7 +163,6 @@ function Main(){
         </form>
       </div>
 
-      
       <div className="confirm" id="popup-confirmation">
         <form className="confirm__form" noValidate>
           <div className="confirm__container">
@@ -164,7 +183,6 @@ function Main(){
         </form>
       </div>
 
-      
       <div className="popup" id="popup-avatar">
         <form className="popup__form" noValidate>
           <div className="popup__container">
@@ -198,14 +216,9 @@ function Main(){
         </form>
       </div>
 
-      
       <div className="viewer">
         <div className="viewer__container">
-          <img
-            src={closeButton}
-            alt="Close Button"
-            className="viewer__close"
-          />
+          <img src={closeButton} alt="Close Button" className="viewer__close" />
           <img src="#" alt="Viewer" className="viewer__image" />
           <p className="viewer__text"></p>
         </div>
@@ -213,7 +226,6 @@ function Main(){
 
       <section className="elements"></section>
 
-      
       <template className="element__template">
         <div className="element">
           <img
@@ -237,8 +249,8 @@ function Main(){
           </div>
         </div>
       </template>
-        </>
-    )
+    </>
+  );
 }
 
 export default Main;
