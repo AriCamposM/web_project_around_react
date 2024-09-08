@@ -1,48 +1,49 @@
-
+import React from "react";
 import editProfileIcon from "../images/edit__profile-icon.png";
 import editButton from "../images/Edit_Button.png";
 import deleteButton from "../images/element__trash.png";
 import likeButton from "../images/elements__heart.png";
-import React from "react";
 import api from "../utils/Api.js";
 import Card from "./Card.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
-function Main({onEditAvatarClick, onEditProfileClick,onAddPlaceClick,onConfirmationClick,onCardClick}) {
+function Main({
+  onEditAvatarClick,
+  onEditProfileClick,
+  onAddPlaceClick,
+  onConfirmationClick,
+  onCardClick,
+}) {
+  const [cards, setCards] = React.useState([]);
 
-  const [userName,setUserName] = React.useState('')
+  const CurrentUser = React.useContext(CurrentUserContext);
 
-  const [userDescription,setUserDescription] = React.useState('');
+  function handleCardLike(card) {
+    const isLiked = card.likes.some((i) => i._id === CurrentUser._id);
 
-  const [userAvatar,setUserAvatar] = React.useState('');
+    const likeAction = isLiked
+      ? api.removeLike(card._id)
+      : api.addLike(card._id);
 
-  const [cards, setCards] = React.useState([])
+    likeAction
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
+      })
+      .catch((err) => console.log(err));
+  }
 
   React.useEffect(() => {
     api
-      .getUserInfo()
-      .then((userData) => {
-        setUserName(userData.name);
-        setUserDescription(userData.about);
-        setUserAvatar(userData.avatar);
-      })
-      .catch((err) => {
-        console.error('Error al obtener la información del usuario:', err);
-      });
-
-    api
       .getInitialCards()
       .then((initialCards) => {
-      setCards(initialCards);
+        setCards(initialCards);
       })
       .catch((err) => {
-      console.error('Error al obtener las tarjetas:', err);
+        console.error("Error al obtener las tarjetas:", err);
       });
   }, []);
-
-
-
-
-
 
   return (
     <>
@@ -51,7 +52,7 @@ function Main({onEditAvatarClick, onEditProfileClick,onAddPlaceClick,onConfirmat
           <div className="profile__photo">
             <img
               className="profile__image"
-              src={userAvatar}
+              src={CurrentUser.avatar}
               alt="Profile Pic"
             />
             <img
@@ -63,7 +64,7 @@ function Main({onEditAvatarClick, onEditProfileClick,onAddPlaceClick,onConfirmat
           </div>
           <div className="profile__info">
             <div className="profile__name">
-              <h1 className="profile__title">{userName}</h1>
+              <h1 className="profile__title">{CurrentUser.name}</h1>
               <button className="profile__button-edit">
                 <img
                   src={editButton}
@@ -73,28 +74,27 @@ function Main({onEditAvatarClick, onEditProfileClick,onAddPlaceClick,onConfirmat
                 />
               </button>
             </div>
-            <h2 className="profile__about">{userDescription}</h2>
+            <h2 className="profile__about">{CurrentUser.about}</h2>
           </div>
 
           <div className="profile__add">
-            <button
-              className="profile__button-add"
-              onClick={onAddPlaceClick}
-            >
+            <button className="profile__button-add" onClick={onAddPlaceClick}>
               +
             </button>
           </div>
         </div>
       </section>
 
-
       <section className="elements">
-        {cards.map((card) =>(
-          <Card key={card._id} card={card} onCardClick={onCardClick}></Card>
+        {cards.map((card) => (
+          <Card
+            onCardLike={handleCardLike}
+            key={card._id}
+            card={card}
+            onCardClick={onCardClick}
+          ></Card>
         ))}
       </section>
-
-    
     </>
   );
 }

@@ -8,6 +8,15 @@
   top: 15px;
   right: 15px;
   z-index: 1;
+  display: none;
+}
+
+.element__trash-visible {
+  display: flex;
+}
+
+.element__trash-hidden {
+  display: none;
 }
 
 .element__trash:hover {
