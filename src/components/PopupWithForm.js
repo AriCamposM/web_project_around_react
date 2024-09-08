@@ -1,6 +1,6 @@
 import React from "react";
 import closeButton from "../images/Close__Icon.png";
-function PopupWithForm({ title,name,isOpen,onClose,children }){
+function PopupWithForm({ title,name,isOpen,onClose,onSubmit,children, }){
 
     const popupClassName = `popup ${isOpen ? 'popup_opened' : ''}`;
 
@@ -10,7 +10,7 @@ function PopupWithForm({ title,name,isOpen,onClose,children }){
                 onClose()
             }
         }}>
-            <form className="popup__form" noValidate>
+            <form className="popup__form" noValidate onSubmit={onSubmit}>
                 <div className="popup__container">
                     <img
                         className="popup__close-button"

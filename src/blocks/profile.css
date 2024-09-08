@@ -200,4 +200,11 @@
     max-height: 50px;
     font-size: 30px;
   }
+  .profile__name{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 25px;
+    
+  }
 }

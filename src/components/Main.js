@@ -13,37 +13,12 @@ function Main({
   onAddPlaceClick,
   onConfirmationClick,
   onCardClick,
+  onCardLike,
+  onCardDelete,
+  cards
 }) {
-  const [cards, setCards] = React.useState([]);
-
+  
   const CurrentUser = React.useContext(CurrentUserContext);
-
-  function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i._id === CurrentUser._id);
-
-    const likeAction = isLiked
-      ? api.removeLike(card._id)
-      : api.addLike(card._id);
-
-    likeAction
-      .then((newCard) => {
-        setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard : c))
-        );
-      })
-      .catch((err) => console.log(err));
-  }
-
-  React.useEffect(() => {
-    api
-      .getInitialCards()
-      .then((initialCards) => {
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.error("Error al obtener las tarjetas:", err);
-      });
-  }, []);
 
   return (
     <>
@@ -65,7 +40,7 @@ function Main({
           <div className="profile__info">
             <div className="profile__name">
               <h1 className="profile__title">{CurrentUser.name}</h1>
-              <button className="profile__button-edit">
+              <button className="profile__button-edit" onClick={onEditProfileClick}>
                 <img
                   src={editButton}
                   alt="Edit Button"
@@ -88,10 +63,11 @@ function Main({
       <section className="elements">
         {cards.map((card) => (
           <Card
-            onCardLike={handleCardLike}
+            onCardLike={onCardLike}
             key={card._id}
             card={card}
             onCardClick={onCardClick}
+            onCardDelete={onCardDelete}
           ></Card>
         ))}
       </section>

@@ -7,6 +7,9 @@ import PopupWithConfirmation from "./PopupWithConfirmation";
 import ImagePopup from "./ImagePopup";
 import api from "../utils/Api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
@@ -53,6 +56,30 @@ function App() {
     setSelectedCard(image);
   };
 
+  const handleUpdateUser = (userData) => {
+    return api
+    .updateUserInfo(userData)
+    .then((updatedUserData) => {
+      setCurrentUser(updatedUserData);
+      closeAllPopups();
+    })
+    .catch((err) => {
+      console.log("Error al actualizar el perfil del usuario: ", err);
+    });
+  }
+
+  function handleUpdateAvatar(avatarData){
+    return api
+    .updateAvatar(avatarData.avatar)
+    .then((updatedUserData) => {
+      setCurrentUser(updatedUserData);
+      closeAllPopups();
+    })
+    .catch((err) => {
+      console.log("Error al actualizar la imagen del usuario: ", err);
+    });
+  }
+
   const closeAllPopups = () => {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
@@ -72,6 +99,61 @@ function App() {
       });
   }, []);
 
+  //Tarjetas
+  const [cards, setCards] = React.useState([]);
+
+  function handleCardLike(card) {
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+
+    const likeAction = isLiked
+      ? api.removeLike(card._id)
+      : api.addLike(card._id);
+
+    likeAction
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
+      })
+      .catch((err) => console.log(err));
+  }
+  
+  function handleCardDelete (card) {
+    api
+      .deleteCard(card._id)
+      .then(()=>{
+        setCards((state) => state.filter((c) => c._id !== card._id));
+      })
+      .catch((err)=>{
+        console.log(`Error al eliminar la tarjeta: ${err}`);
+      })
+  }
+
+  React.useEffect(() => {
+    api
+      .getInitialCards()
+      .then((initialCards) => {
+        setCards(initialCards);
+      })
+      .catch((err) => {
+        console.error("Error al obtener las tarjetas:", err);
+      });
+  }, []);
+
+  //Agregar Tarjeta Submit
+  
+  function handleAddPlaceSubmit(newCard) {
+    return api
+      .addNewCard(newCard)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((err) => {
+        console.log("Error al agregar una nueva tarjeta: ", err);
+      });
+  }
+
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
@@ -83,125 +165,31 @@ function App() {
           onAddPlaceClick={handleAddPlaceClick}
           onConfirmationClick={handleConfirmationClick}
           onCardClick={handleCardClick}
+          onCardLike={handleCardLike}
+          onCardDelete={handleCardDelete}
+          cards={cards}
         />
 
         <Footer />
 
-        <PopupWithForm
-          name={"profile"}
-          title={"Editar Perfil"}
+        <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
           onClose={closeAllPopups}
-        >
-          <label htmlFor="input-name" className="popup__label"></label>
-          <input
-            name="name"
-            type="text"
-            className="popup__input-name popup__input"
-            id="input-name"
-            required
-            placeholder="Nombre"
-            minLength="2"
-            maxLength="40"
-          />
-          <span
-            className="popup__error input-name-error"
-            id="input-name-error"
-          ></span>
-          <label htmlFor="input-about" className="popup__label"></label>
-          <input
-            type="text"
-            name="about"
-            id="input-about"
-            className="popup__input-about popup__input"
-            required
-            placeholder="Acerca de mí"
-            minLength="2"
-            maxLength="200"
-          />
-          <span
-            className="popup__error input-about-error"
-            id="input-about-error"
-          ></span>
-          <button
-            className="popup__button"
-            id="popup__button-profile"
-            type="submit"
-          >
-            Guardar
-          </button>
-        </PopupWithForm>
-
-        <PopupWithForm
-          name={"cards"}
-          title={"Nuevo Lugar"}
+          onUpdateUser={handleUpdateUser}
+        />
+        
+        <AddPlacePopup
           isOpen={isAddPlacePopupOpen}
           onClose={closeAllPopups}
-        >
-          <label htmlFor="input-name" className="popup__label"></label>
-          <input
-            type="text"
-            className="popup__input-name popup__input"
-            id="input-name"
-            required
-            placeholder="Nombre"
-            minLength="2"
-            maxLength="30"
-            name="name"
-          />
-          <span
-            className="popup__error input-name-error"
-            id="input-name-error"
-          ></span>
-          <label htmlFor="input-link" className="popup__label"></label>
-          <input
-            type="url"
-            name="link"
-            id="input-link"
-            className="popup__input-about popup__input"
-            required
-            placeholder="Enlace a la imagen"
-          />
-          <span
-            className="popup__error input-link-error"
-            id="input-link-error"
-          ></span>
-          <button
-            className="popup__button"
-            id="popup__button-cards"
-            type="submit"
-          >
-            Crear
-          </button>
-        </PopupWithForm>
+          onAddPlaceSubmit={handleAddPlaceSubmit}
+        />
+          
 
-        <PopupWithForm
-          name={"avatar"}
-          title={"Cambiar Foto De Perfil"}
+        <EditAvatarPopup
+          onUpdateAvatar={handleUpdateAvatar}
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
-        >
-          <label htmlFor="input-avatar" className="popup__label"></label>
-          <input
-            type="url"
-            name="avatar"
-            id="input-avatar"
-            className="popup__input-about popup__input"
-            required
-            placeholder="Enlace a la imagen"
-          />
-          <span
-            className="popup__error input-avatar-error"
-            id="input-avatar-error"
-          ></span>
-          <button
-            className="popup__button"
-            id="popup__button-avatar"
-            type="submit"
-          >
-            Guardar
-          </button>
-        </PopupWithForm>
+        />
 
         <PopupWithConfirmation
           name={"confirmation"}

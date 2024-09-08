@@ -4,13 +4,17 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import TrashIcon from "../images/element__trash.png";
 import likeButtonActive from "../images/heart__black.png";
 
-function Card({ card, onCardClick, onCardLike }) {
+function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   function handleClick() {
     onCardClick(card);
   }
 
   function handleLikeClick() {
     onCardLike(card);
+  }
+
+  function handleDeleteClick() {
+    onCardDelete(card);
   }
 
   const CurrentUser = React.useContext(CurrentUserContext);
@@ -35,6 +39,7 @@ function Card({ card, onCardClick, onCardLike }) {
         src={TrashIcon}
         alt="Delete Button Of The Card"
         className={cardDeleteButtonClassName}
+        onClick={handleDeleteClick}
       />
       <div className="element__image-container">
         <img
